@@ -26,8 +26,8 @@ def ucs(graph, start, goal):
         if node == goal:
             return path
         
-        for node2, cost in graph.get(node, []):
-            new_path = path + [(node2, cost)]
+        for neighbor, cost in graph.get(node, []):
+            new_path = path + [(neighbor, cost)]
             queue.append(new_path)
 
 solution = ucs(graph, 's', 'G')

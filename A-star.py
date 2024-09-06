@@ -1,48 +1,33 @@
-from queue import PriorityQueue
+import heapq
 
-def a_star(graph, start, goal, heuristic):
-    open_set = PriorityQueue()
-    open_set.put((0, start))
-    g_costs = {start: 0}
-    parents = {start: None}
-    
-    while not open_set.empty():
-        _, current = open_set.get()
-        
+def heuristic(node):
+    h = {'A': 10, 'B': 15, 'C': 5, 'D': 5, 'E': 10, 'F': 0}
+    return h[node]
+
+def astar(graph, start, goal):
+    pq = []
+    visited = set()
+    heapq.heappush(pq, (heuristic(start), start, None, 0))
+    while pq:
+        _, current, parent, g_cost = heapq.heappop(pq)
+        visited.add(current)
         if current == goal:
             path = []
             while current:
-                path.append(current)
-                current = parents[current]
-            return path[::-1]
-        
-        for neighbor, weight in graph.get(current, []):
-            g = g_costs[current] + weight
-            if g < g_costs.get(neighbor, float('inf')):
-                g_costs[neighbor] = g
-                f = g + heuristic[neighbor]
-                open_set.put((f, neighbor))
-                parents[neighbor] = current
-    
+                path.insert(0, current)
+                current = None
+                if parent:
+                    current, parent, _ = parent
+            return path
+        for neighbor, cost in graph[current]:
+            if neighbor not in visited:
+                #if neighbor not in (node for _, node, _, _ in pq):
+                heapq.heappush(pq, (g_cost + cost + heuristic(neighbor), neighbor, (current, parent, g_cost), g_cost + cost))
     return None
 
-# Heuristic function and graph definition
-heuristic = {
-    'A': 11,
-    'B': 6,
-    'C': 99,
-    'D': 1,
-    'E': 7,
-    'G': 0
-}
-
-graph = {
-    'A': [('B', 2), ('E', 3)],
-    'B': [('C', 1), ('G', 9)],
-    'E': [('D', 6)],
-    'D': [('G', 1)],
-}
-
-# Running the A* algorithm
-path = a_star(graph, 'A', 'G', heuristic)
-print(f"Path found: {path}")
+graph = { 'A': [('B', 10), ('D', 5), ('C', 12)], 'B': [('E', 11)], 'C': [('D', 5), ('E', 11), ('F', 8)], 'D': [('F', 14)], 'E': [] }
+path = astar(graph, 'A', 'F')
+if path:
+    print("Path found:", path)
+else:
+    print("Path not found")

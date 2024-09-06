@@ -28,6 +28,7 @@ def crossover(parent1, parent2):
 # Mutation Function: Flip bits in the genome with a small probability
 def mutate(individual, rate):
     mutation = np.random.rand(len(individual)) < rate
+    
     individual[mutation] = 1 - individual[mutation]
     return individual
 
@@ -46,7 +47,8 @@ def genetic_algorithm():
             new_population.append(mutate(child2, MUTATION_RATE))
         
         population = np.array(new_population)
-        print(f"Best Fitness: {max(fitness_scores)}")
+        best_fitness = max(fitness_scores)
+        print(f"Best Fitness: {best_fitness}")
     
     best_individual = population[np.argmax([fitness(ind) for ind in population])]
     return best_individual
