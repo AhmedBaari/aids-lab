@@ -1,19 +1,31 @@
-def fun(assign, graph, colors):
-    if all(i != -1 for i in assign.values()):
-        return assign
-    var = next((i for i in assign if assign[i] == -1), None)
-    for i in range(len(colors)):
-        if all(assign[j] != i for j in graph[var]):
-            assign[var] = i
-            if result := fun(assign, graph, colors):
+def color_graph(assignment, graph, colors):
+    # If all nodes are assigned a color, return the assignment
+    if all(color != -1 for color in assignment.values()):
+        return assignment
+
+    # Pick the next unassigned node
+    node = next((n for n in assignment if assignment[n] == -1), None)
+
+    # Try assigning each color
+    for color_index in range(len(colors)):
+        if all(assignment[neighbor] != color_index for neighbor in graph[node]):
+            assignment[node] = color_index
+            if result := color_graph(assignment, graph, colors):
                 return result
-            assign[var] = -1
+            assignment[node] = -1  # backtrack
+
     return None
+
+# Graph structure and available colors
 graph = {'a': ['b', 'c'], 'b': ['a', 'c', 'd', 'e'], 'c': ['b', 'e'], 'd': ['a', 'b', 'e'], 'e': ['b', 'c', 'd']}
 colors = ["Red", "Green", "Blue"]
-sol = fun({i: -1 for i in graph}, graph, colors)
-if sol:
-    for node in sol:
-        print("Node:", node, "\tColor:", colors[sol[node]])
+
+# Initialize assignment (-1 means no color assigned)
+solution = color_graph({node: -1 for node in graph}, graph, colors)
+
+# Print solution if found, else indicate no solution
+if solution:
+    for node in solution:
+        print(f"Node: {node}\tColor: {colors[solution[node]]}")
 else:
     print("No solution exists")
