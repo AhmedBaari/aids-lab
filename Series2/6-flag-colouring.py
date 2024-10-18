@@ -1,3 +1,5 @@
+# Original Code by Shriram Jayakar
+
 def color_graph(assignment, graph, colors):
     # If all nodes are assigned a color, return the assignment
     if all(color != -1 for color in assignment.values()):
