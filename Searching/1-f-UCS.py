@@ -8,8 +8,7 @@ graph = {
 
 def path_cost(path):
     total_cost = sum(cost for node, cost in path)
-    last_node = path[-1][0]
-    return total_cost, last_node
+    return total_cost
 
 def ucs(graph, start, goal):
     visited = set()
@@ -28,10 +27,10 @@ def ucs(graph, start, goal):
         if node == goal:
             return path
         
-        for neighbor, cost in graph.get(node, []):
+        for neighbor, cost in graph[node]:
             new_path = path + [(neighbor, cost)]
             queue.append(new_path)
 
 solution = ucs(graph, 's', 'G')
 print("The solution is:", solution)
-print("Cost of the solution is:", path_cost(solution)[0])
+#print("Cost of the solution is:", path_cost(solution)[0])
