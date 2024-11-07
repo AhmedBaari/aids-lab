@@ -7,7 +7,9 @@ graph = {
 }
 
 def path_cost(path):
-    return sum(cost for node, cost in path), path[-1][0]
+    total_cost = sum(cost for node, cost in path)
+    last_node = path[-1][0]
+    return total_cost, last_node
 
 def ucs(graph, start, goal):
     visited = set()

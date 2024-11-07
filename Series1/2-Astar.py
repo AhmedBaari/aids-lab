@@ -5,9 +5,13 @@ def heuristic(node):
     return h[node]
 
 def astar(graph, start, goal):
-    pq = []
+    pq = [] #priority queue (min priority)
     visited = set()
-    heapq.heappush(pq, (heuristic(start), start, None, 0))
+
+    # the queue (pq) -- (heuristic, current node, parent, g_cost)
+    heapq.heappush(pq, (heuristic(start), start, None, 0)) #pushing start node
+
+    # BFS
     while pq:
         _, current, parent, g_cost = heapq.heappop(pq)
         visited.add(current)
@@ -22,6 +26,10 @@ def astar(graph, start, goal):
         for neighbor, cost in graph[current]:
             if neighbor not in visited:
                 #if neighbor not in (node for _, node, _, _ in pq):
+
+                # HEURISTIC = g_cost + cost + heuristic
+                # COST = g_cost + cost
+                # PARENT = (current,parent,g_cost)
                 heapq.heappush(pq, (g_cost + cost + heuristic(neighbor), neighbor, (current, parent, g_cost), g_cost + cost))
     return None
 

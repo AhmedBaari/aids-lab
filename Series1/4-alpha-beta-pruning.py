@@ -1,22 +1,42 @@
 def alphabeta(node, graph, ismax, alpha=-float('inf'), beta=float('inf')):
+    # Base case: if the node is a leaf (integer value), return it
     if isinstance(node, int):
         return node
+
+    # Maximizing player's turn
     if ismax:
-        opti = -float('inf')
         for child in graph[node]:
-            val = alphabeta(child, graph, False, alpha, beta)
-            opti = max(opti, val)
-            alpha = max(alpha, opti)
+            value = alphabeta(child, graph, False, alpha, beta)
+            alpha = max(alpha, value)
+
             if alpha >= beta:
                 break
+        return alpha
+
+    # Minimizing player's turn
     else:
-        opti = float('inf')
         for child in graph[node]:
-            val = alphabeta(child, graph, True, alpha, beta)
-            opti = min(opti, val)
-            beta = min(beta, opti)
+            value = alphabeta(child, graph, True, alpha, beta)
+            beta = min(beta,value)
+
             if alpha >= beta:
                 break
-    return opti
-graph = {'A': ['B', 'C', 'D'], 'B': ['E', 'F'], 'C': ['G', 'H', 'I'], 'D': ['J', 'K'], 'E': [4, 3], 'F': [6, 2], 'G': [2, 1], 'H': [9, 5], 'I': [3, 1], 'J': [5, 4], 'K': [7, 5] }
+        return beta
+
+# Example game tree
+graph = {
+    'A': ['B', 'C', 'D'], 
+    'B': ['E', 'F'], 
+    'C': ['G', 'H', 'I'], 
+    'D': ['J', 'K'], 
+    'E': [4, 3], 
+    'F': [6, 2], 
+    'G': [2, 1], 
+    'H': [9, 5], 
+    'I': [3, 1], 
+    'J': [5, 4], 
+    'K': [7, 5] 
+}
+
+# Run the alphabeta pruning starting from the root node
 print(alphabeta('A', graph, True))

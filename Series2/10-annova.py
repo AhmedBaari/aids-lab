@@ -1,39 +1,56 @@
-# Original code by Ahmed Baari
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
 
-col1 = [1,2,3]
-col2 = [4,5,6]
-col3 = [7,8,9]
+# Load the dataset
+data = pd.read_csv('acquiredDataset.csv')
 
-# T^2 is the square of sum of all the values in the column, for each column added together
-t2 = sum(col1)**2 + sum(col2)**2 + sum(col3)**2
+# Set the significance level
+alpha = 0.05
 
-# G^2 is the square of the grand total
-g2 = (sum(col1) + sum(col2) + sum(col3))**2
+# Calculate the grand mean
+grand_mean = data['attention'].mean()
 
-n = len(col1) # Number of samples in each column
-N = len(col1) + len(col2) + len(col3)   # Total number of samples
+# Group data by 'classification'
+grouped_data = data.groupby('classification')
 
-SS_between = (t2 / n) - (g2 / N)
+# Calculate SS Between (SSB) and MSB
+ss_between = sum(len(group) * (group['attention'].mean() - grand_mean) ** 2 for _, group in grouped_data)
+df_between = len(grouped_data) - 1
+ms_between = ss_between / df_between
 
-S_x2 = sum([x**2 for x in col1]) + sum([x**2 for x in col2]) + sum([x**2 for x in col3])
+# Calculate SS Within (SSW) and MSW
+ss_within = sum(((group['attention'] - group['attention'].mean()) ** 2).sum() for _, group in grouped_data)
+df_within = len(data) - len(grouped_data)
+ms_within = ss_within / df_within
 
-SS_within = S_x2 - t2 / N
+# Calculate F-statistic
+F_statistic = ms_between / ms_within
 
-k = 3 # Number of columns
-df_between = k - 1
-df_within = N - k
+# Determine the critical value
+critical_value = stats.f.ppf(1 - alpha, df_between, df_within)
 
-MS_between = SS_between / df_between
-MS_within = SS_within / df_within
+# Print ANOVA results
+print("ANOVA Results:")
+print(f"F Statistic: {F_statistic:.2f}")
+print(f"Critical Value: {critical_value:.2f}")
 
-F = MS_between / MS_within
-
-print(f'F-statistic: {F}')
-
-# Hypothesis Test
-critical_value = 3.885  # 2 tail
-if F <= critical_value:
-    print("Accept the Null Hypothesis")
-
+# Decision
+if F_statistic > critical_value:
+    print("Reject the null hypothesis. There is a significant difference between the group means.")
 else:
-    print("Reject the Null Hypothesis")
+    print("Fail to reject the null hypothesis. No significant difference between group means.")
+
+# Plot the F-distribution
+x = np.linspace(0, F_statistic + 2, 500)
+y = stats.f.pdf(x, df_between, df_within)
+
+plt.plot(x, y, label='F-distribution')
+plt.axvline(F_statistic, color='red', label=f'F-statistic = {F_statistic:.2f}')
+plt.axvline(critical_value, color='green', linestyle='--', label=f'Critical F-value = {critical_value:.2f}')
+plt.xlabel('F-value')
+plt.ylabel('Probability Density')
+plt.title('F-distribution with F-statistic and Critical Value')
+plt.legend()
+plt.show()
